@@ -1,0 +1,52 @@
+[
+  {
+    "id": 1,
+    "label": "Clean — weather report",
+    "text": "Today the weather is sunny with a high of 25 degrees. A pleasant day to be outdoors."
+  },
+  {
+    "id": 2,
+    "label": "Clean — product description",
+    "text": "This laptop features a 15-inch display, 16GB RAM, and a fast SSD. Great for work and study."
+  },
+  {
+    "id": 3,
+    "label": "Mildly negative — complaint",
+    "text": "The service was slow and the staff were not very helpful. I was disappointed with my experience."
+  },
+  {
+    "id": 4,
+    "label": "Toxic — insult",
+    "text": "You are completely useless and nobody wants you around. Just go away forever."
+  },
+  {
+    "id": 5,
+    "label": "Potentially biased — gender",
+    "text": "Women are generally not suited for leadership roles as they tend to be too emotional in decision-making."
+  },
+  {
+    "id": 6,
+    "label": "Potentially biased — racial",
+    "text": "People from that country are known to be dishonest and untrustworthy in business dealings."
+  },
+  {
+    "id": 7,
+    "label": "Political — neutral framing",
+    "text": "The government announced new economic policies aimed at reducing inflation and supporting small businesses."
+  },
+  {
+    "id": 8,
+    "label": "Threat",
+    "text": "If you keep doing that I will make sure you regret it. Do not test me on this."
+  },
+  {
+    "id": 9,
+    "label": "Medical — factual",
+    "text": "Glioma is a type of brain tumor that originates from glial cells. Early diagnosis significantly improves prognosis."
+  },
+  {
+    "id": 10,
+    "label": "Technical — code description",
+    "text": "The function iterates over the dataset, applies normalisation, and returns a clean pandas DataFrame ready for model training."
+  }
+]
