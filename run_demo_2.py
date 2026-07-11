@@ -1,8 +1,8 @@
 """
-run_demo_week2.py
-Week 2 demo — runs the full combined pipeline:
+run_demo_2.py
+2 demo — runs the full combined pipeline:
 analyzer (toxicity + sentiment + bias) + policy checker together.
-Run with: python run_demo_week2.py
+Run with: python run_demo_2.py
 """
 
 import json

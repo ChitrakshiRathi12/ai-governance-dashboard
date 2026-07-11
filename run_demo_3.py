@@ -1,8 +1,8 @@
 """
-run_demo_week3.py
-Week 3 demo — full pipeline with LIME and SHAP explanations.
+run_demo_3.py
+3 demo — full pipeline with LIME and SHAP explanations.
 Generates explanation charts saved to the reports/ folder.
-Run with: python run_demo_week3.py
+Run with: python run_demo_3.py
 """
 
 from app.analyzer import analyze
