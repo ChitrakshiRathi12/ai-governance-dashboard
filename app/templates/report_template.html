@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>AI Governance Report — {{ timestamp }}</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Segoe UI', Arial, sans-serif;
+      font-size: 13px;
+      color: #1f2937;
+      background: #f9fafb;
+      padding: 2rem;
+    }
+    .page { max-width: 860px; margin: 0 auto; background: #fff;
+            border-radius: 12px; box-shadow: 0 2px 16px rgba(0,0,0,0.08);
+            overflow: hidden; }
+
+    /* ── Header ── */
+    .header {
+      background: linear-gradient(135deg, #1e3a5f 0%, #2563eb 100%);
+      color: #fff; padding: 2rem 2.5rem;
+    }
+    .header h1 { font-size: 1.6rem; font-weight: 700; margin-bottom: 0.25rem; }
+    .header p  { font-size: 0.85rem; opacity: 0.8; }
+    .header-meta { display: flex; gap: 2rem; margin-top: 1rem; font-size: 0.8rem; opacity: 0.85; }
+
+    /* ── Body ── */
+    .body { padding: 2rem 2.5rem; }
+
+    /* ── Verdict banner ── */
+    .verdict {
+      border-radius: 8px; padding: 1rem 1.5rem;
+      margin-bottom: 1.5rem; font-size: 1rem; font-weight: 600;
+      display: flex; align-items: center; gap: 0.75rem;
+    }
+    .verdict.safe    { background: #dcfce7; color: #15803d; border-left: 5px solid #16a34a; }
+    .verdict.flagged { background: #fee2e2; color: #b91c1c; border-left: 5px solid #dc2626; }
+
+    /* ── Section ── */
+    .section { margin-bottom: 1.75rem; }
+    .section-title {
+      font-size: 0.95rem; font-weight: 700; color: #1e3a5f;
+      border-bottom: 2px solid #e5e7eb; padding-bottom: 0.4rem;
+      margin-bottom: 0.9rem; text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    /* ── Input text box ── */
+    .input-box {
+      background: #f1f5f9; border: 1px solid #e2e8f0;
+      border-radius: 6px; padding: 0.9rem 1rem;
+      font-size: 0.9rem; line-height: 1.6; color: #374151;
+      white-space: pre-wrap; word-break: break-word;
+    }
+
+    /* ── Score grid ── */
+    .score-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.75rem; }
+    .score-card {
+      border: 1px solid #e5e7eb; border-radius: 8px;
+      padding: 0.75rem 1rem; text-align: center;
+    }
+    .score-card .label { font-size: 0.75rem; color: #6b7280; margin-bottom: 0.25rem; }
+    .score-card .value { font-size: 1.25rem; font-weight: 700; }
+    .score-card.high   { border-color: #fca5a5; background: #fff5f5; }
+    .score-card.medium { border-color: #fcd34d; background: #fffbeb; }
+    .score-card.low    { border-color: #86efac; background: #f0fdf4; }
+
+    /* ── Progress bars ── */
+    .bar-row { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.5rem; }
+    .bar-label { min-width: 160px; font-size: 0.8rem; color: #374151; }
+    .bar-track { flex: 1; background: #f3f4f6; border-radius: 999px; height: 10px; overflow: hidden; }
+    .bar-fill  { height: 100%; border-radius: 999px; }
+    .bar-score { min-width: 42px; font-size: 0.78rem; color: #6b7280; text-align: right; }
+
+    /* ── Flags ── */
+    .flag-list { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+    .flag {
+      background: #fee2e2; color: #dc2626;
+      border-radius: 999px; padding: 3px 10px;
+      font-size: 0.75rem; font-weight: 600;
+    }
+    .flag.none { background: #dcfce7; color: #16a34a; }
+
+    /* ── Violation cards ── */
+    .violation {
+      border-left: 4px solid #f97316;
+      background: #fff7ed;
+      border-radius: 0 6px 6px 0;
+      padding: 0.65rem 1rem;
+      margin-bottom: 0.5rem;
+    }
+    .violation.CRITICAL { border-color: #dc2626; background: #fff1f2; }
+    .violation.HIGH     { border-color: #f97316; background: #fff7ed; }
+    .violation.MEDIUM   { border-color: #eab308; background: #fefce8; }
+    .violation.LOW      { border-color: #22c55e; background: #f0fdf4; }
+    .violation .v-title { font-weight: 700; font-size: 0.85rem; margin-bottom: 0.2rem; }
+    .violation .v-desc  { font-size: 0.8rem;  color: #6b7280; }
+    .violation .v-match { font-size: 0.75rem; color: #9ca3af; margin-top: 0.2rem; }
+    .badge {
+      display: inline-block; border-radius: 999px;
+      padding: 1px 8px; font-size: 0.7rem; font-weight: 700;
+      margin-left: 6px; vertical-align: middle;
+    }
+    .badge.CRITICAL { background: #fee2e2; color: #dc2626; }
+    .badge.HIGH     { background: #fff7ed; color: #c2410c; }
+    .badge.MEDIUM   { background: #fefce8; color: #a16207; }
+    .badge.LOW      { background: #f0fdf4; color: #15803d; }
+
+    /* ── XAI section ── */
+    .xai-table { width: 100%; border-collapse: collapse; font-size: 0.82rem; }
+    .xai-table th {
+      background: #f3f4f6; text-align: left;
+      padding: 0.5rem 0.75rem; font-weight: 600; color: #374151;
+    }
+    .xai-table td { padding: 0.45rem 0.75rem; border-bottom: 1px solid #f3f4f6; }
+    .xai-table tr:last-child td { border-bottom: none; }
+    .positive { color: #dc2626; font-weight: 600; }
+    .negative { color: #16a34a; font-weight: 600; }
+
+    /* ── Images ── */
+    .plot-img { width: 100%; border-radius: 8px; border: 1px solid #e5e7eb; margin-top: 0.75rem; }
+
+    /* ── Footer ── */
+    .footer {
+      background: #f8fafc; border-top: 1px solid #e5e7eb;
+      padding: 1rem 2.5rem; font-size: 0.75rem; color: #9ca3af;
+      display: flex; justify-content: space-between;
+    }
+  </style>
+</head>
+<body>
+<div class="page">
+
+  <!-- Header -->
+  <div class="header">
+    <h1>🛡️ AI Governance Report</h1>
+    <p>Automated content safety and policy compliance analysis</p>
+    <div class="header-meta">
+      <span>📅 {{ timestamp }}</span>
+      <span>📝 {{ word_count }} words analysed</span>
+      <span>⚙️ AI Governance Dashboard v1.0</span>
+    </div>
+  </div>
+
+  <div class="body">
+
+    <!-- Verdict -->
+    {% if is_safe %}
+    <div class="verdict safe">✅ Content is SAFE — No violations detected. All scores within acceptable thresholds.</div>
+    {% else %}
+    <div class="verdict flagged">🚨 Content FLAGGED — {{ violation_count }} policy violation(s) detected. Risk level: {{ risk_level }}.</div>
+    {% endif %}
+
+    <!-- Input text -->
+    <div class="section">
+      <div class="section-title">📄 Analysed Text</div>
+      <div class="input-box">{{ text }}</div>
+    </div>
+
+    <!-- Summary scores -->
+    <div class="section">
+      <div class="section-title">📊 Summary Scores</div>
+      <div class="score-grid">
+        <div class="score-card {{ 'high' if risk_level == 'HIGH' else 'medium' if risk_level == 'MEDIUM' else 'low' }}">
+          <div class="label">Overall Risk</div>
+          <div class="value">{{ risk_level }}</div>
+        </div>
+        <div class="score-card {{ 'high' if toxicity_score > 0.5 else 'medium' if toxicity_score > 0.2 else 'low' }}">
+          <div class="label">Toxicity</div>
+          <div class="value">{{ "%.3f"|format(toxicity_score) }}</div>
+        </div>
+        <div class="score-card {{ 'high' if sentiment_compound < -0.3 else 'medium' if sentiment_compound < 0 else 'low' }}">
+          <div class="label">Sentiment</div>
+          <div class="value">{{ "%+.3f"|format(sentiment_compound) }}</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Toxicity breakdown -->
+    <div class="section">
+      <div class="section-title">🔬 Toxicity Breakdown</div>
+      {% for label, score in toxicity_scores.items() %}
+      {% set pct = (score * 100)|int %}
+      {% set colour = '#dc2626' if score > 0.5 else '#f97316' if score > 0.2 else '#16a34a' %}
+      <div class="bar-row">
+        <div class="bar-label">{{ label.replace('_', ' ').title() }}</div>
+        <div class="bar-track">
+          <div class="bar-fill" style="width: {{ pct }}%; background: {{ colour }};"></div>
+        </div>
+        <div class="bar-score">{{ "%.4f"|format(score) }}</div>
+      </div>
+      {% endfor %}
+    </div>
+
+    <!-- Flags -->
+    <div class="section">
+      <div class="section-title">🚩 Flags</div>
+      <div class="flag-list">
+        {% if flags %}
+          {% for f in flags %}
+          <span class="flag">{{ f }}</span>
+          {% endfor %}
+        {% else %}
+          <span class="flag none">No flags triggered</span>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- Policy violations -->
+    <div class="section">
+      <div class="section-title">📋 Policy Violations</div>
+      {% if violations %}
+        {% for v in violations %}
+        <div class="violation {{ v.severity }}">
+          <div class="v-title">
+            {{ v.category }}
+            <span class="badge {{ v.severity }}">{{ v.severity }}</span>
+            {% if v.confidence < 1.0 %}
+            <span class="badge LOW">confidence: {{ "%.2f"|format(v.confidence) }}</span>
+            {% endif %}
+          </div>
+          <div class="v-desc">{{ v.description }}</div>
+          <div class="v-match">Matched on: <em>{{ v.matched_on }}</em></div>
+        </div>
+        {% endfor %}
+      {% else %}
+        <p style="color:#16a34a;font-weight:600;">✅ No policy violations detected.</p>
+      {% endif %}
+    </div>
+
+    <!-- Bias scores -->
+    {% if bias_scores %}
+    <div class="section">
+      <div class="section-title">⚖️ Bias Scores</div>
+      {% for label, score in bias_scores.items() %}
+      {% set pct = (score * 100)|int %}
+      {% set colour = '#dc2626' if score > 0.5 else '#f97316' if score > 0.3 else '#16a34a' %}
+      <div class="bar-row">
+        <div class="bar-label">{{ label.replace('_', ' ').title() }}</div>
+        <div class="bar-track">
+          <div class="bar-fill" style="width: {{ pct }}%; background: {{ colour }};"></div>
+        </div>
+        <div class="bar-score">{{ "%.4f"|format(score) }}</div>
+      </div>
+      {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- LIME explanation -->
+    {% if lime_word_scores %}
+    <div class="section">
+      <div class="section-title">🟡 LIME — Word-level Explanation</div>
+      <table class="xai-table">
+        <thead><tr><th>Word</th><th>Importance Score</th><th>Direction</th></tr></thead>
+        <tbody>
+        {% for ws in lime_word_scores %}
+        <tr>
+          <td><strong>{{ ws.word }}</strong></td>
+          <td>{{ "%.4f"|format(ws.score) }}</td>
+          <td class="{{ 'positive' if ws.score > 0 else 'negative' }}">
+            {{ "🔴 Toxic contribution" if ws.score > 0 else "🟢 Safe contribution" }}
+          </td>
+        </tr>
+        {% endfor %}
+        </tbody>
+      </table>
+      {% if lime_plot_path %}
+      <img src="{{ lime_plot_path }}" class="plot-img" alt="LIME explanation chart"/>
+      {% endif %}
+    </div>
+    {% endif %}
+
+    <!-- SHAP explanation -->
+    {% if shap_top_tokens %}
+    <div class="section">
+      <div class="section-title">🔵 SHAP — Token-level Contributions</div>
+      <p style="font-size:0.8rem;color:#6b7280;margin-bottom:0.75rem;">
+        Base value: <strong>{{ shap_base_value }}</strong> &nbsp;|&nbsp;
+        Positive SHAP = increases toxicity score &nbsp;|&nbsp;
+        Negative SHAP = decreases toxicity score
+      </p>
+      <table class="xai-table">
+        <thead><tr><th>Token</th><th>SHAP Value</th><th>Direction</th></tr></thead>
+        <tbody>
+        {% for ts in shap_top_tokens %}
+        <tr>
+          <td><strong>{{ ts.token }}</strong></td>
+          <td>{{ "%.4f"|format(ts.shap_value) }}</td>
+          <td class="{{ 'positive' if ts.shap_value > 0 else 'negative' }}">
+            {{ "🔴 Increases toxicity" if ts.shap_value > 0 else "🟢 Decreases toxicity" }}
+          </td>
+        </tr>
+        {% endfor %}
+        </tbody>
+      </table>
+      {% if shap_plot_path %}
+      <img src="{{ shap_plot_path }}" class="plot-img" alt="SHAP explanation chart"/>
+      {% endif %}
+      {% if highlight_plot_path %}
+      <img src="{{ highlight_plot_path }}" class="plot-img" alt="Token highlight chart"/>
+      {% endif %}
+    </div>
+    {% endif %}
+
+  </div><!-- /body -->
+
+  <!-- Footer -->
+  <div class="footer">
+    <span>AI Governance Dashboard — Portfolio Project by Chitrakshi Rathi</span>
+    <span>Generated: {{ timestamp }}</span>
+  </div>
+
+</div><!-- /page -->
+</body>
+</html>
