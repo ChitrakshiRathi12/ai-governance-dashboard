@@ -1,6 +1,6 @@
 """
-run_demo_week5.py
-Week 5 demo — full pipeline with HTML report generation.
+run_demo_5.py
+5 demo — full pipeline with HTML report generation.
 Run with: python run_demo_week5.py
 Then open reports/ folder to see the generated HTML report.
 """
