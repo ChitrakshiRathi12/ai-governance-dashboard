@@ -1,6 +1,6 @@
 """
-run_demo_week6.py
-Week 6 demo — tests the FastAPI endpoints locally.
+run_demo_6.py
+6 demo — tests the FastAPI endpoints locally.
 First start the API: uvicorn app.main:app --reload
 Then in another terminal: python run_demo_week6.py
 """
